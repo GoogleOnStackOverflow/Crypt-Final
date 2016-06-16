@@ -295,7 +295,7 @@ size_t big::div_many(){
 	size_t to_return = 0;
 	if(m_num[0])
 		return to_return;
-	// blabla
+
 	reverse(m_num.begin(),m_num.end());
 	while(!m_num.back()){
 		m_num.pop_back();
