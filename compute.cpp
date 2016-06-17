@@ -76,16 +76,22 @@ compute::compute (string input){
 	big one("1");
 
 	loopTimes = 1;
+	mapping.clear();
 
+	big cutTimeBig;
 	while(!(L == one)){
 		showLoopTimes(loopTimes++);
 		++totalLoops;
 
 		size_t cutTime = L.div_many();
-		if(cutTime != 0)
-			Phy = Phy - sizet_to_big(cutTime);
-		else if(!(L == one))
+
+		if(cutTime != 0){
+			for(size_t i=0;i<cutTime;i++){
+				Phy = Phy - one;
+			}
+		}else if(!(L == one)){
 			L = L + N;
+		}
 	}
 	/* Legacy Code
 	while(!(L == one)){
@@ -132,7 +138,8 @@ compute::compute (string input){
 }
 
 // private function
-big compute::sizet_to_big(size_t s){
+char* compute::sizet_to_string(size_t s){
+	big return_big;
 	vector<char> temp;
 	while(s != 0){
 		temp.push_back(sizet_to_char(s % 10));
@@ -144,7 +151,13 @@ big compute::sizet_to_big(size_t s){
 		to_return[i] = temp[l-i-1];
 	}
 
-	return big(to_return);
+	return to_return;
+}
+
+big compute::sizet_to_big(size_t s){
+	big return_big(sizet_to_string(s));
+
+	return return_big;
 }
 
 char compute::sizet_to_char(size_t s){

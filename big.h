@@ -21,6 +21,7 @@ public:
 
 	big operator + (const big&);
 	big operator - (const big&);
+	big operator - (const string&);
 	big operator * (const big&);
 	big operator = (string);
 	bool operator == (const big&);

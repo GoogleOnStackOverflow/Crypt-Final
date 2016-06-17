@@ -206,6 +206,48 @@ big big::operator - (const big& y){
 	return big(to_return);
 }
 
+big big::operator - (const string& str){
+	big y(str);
+	if(*this < y)
+		return big("0");
+
+	bool over = false;
+	vector<bool> to_return;
+
+	bool y_larger = !meLarger(y);
+	vector<bool> larger = y_larger ? y.m_num : m_num;
+	vector<bool> smaller = y_larger? m_num : y.m_num;
+
+	for(size_t i =0, l =larger.size(), k=smaller.size(); i<l; i++){
+		if(i < k){
+			if(larger[i]){
+				if(smaller[i]){
+					to_return.push_back(over);
+				}else{
+					to_return.push_back(!over);
+					over = false;
+				}
+			}else{
+				if(smaller[i]){
+					to_return.push_back(!over);
+					over = true;
+				}else{
+					to_return.push_back(over);
+				}
+			}
+		}else{
+			to_return.push_back(over != larger[i]);
+			over = over > larger[i];
+		}
+	}
+
+	while(!to_return.empty() && !to_return[to_return.size()-1] ){
+		to_return.pop_back();
+	}
+
+	return big(to_return);
+}
+
 big big::operator * (const big& y){
 	if(y.m_num.size() == 0 || m_num.size() == 0){
 		return big("0");
@@ -293,11 +335,11 @@ bool big::divable(){
 
 size_t big::div_many(){
 	size_t to_return = 0;
-	if(m_num[0])
+	if(m_num.empty() || m_num[0])
 		return to_return;
 
 	reverse(m_num.begin(),m_num.end());
-	while(!m_num.back()){
+	while(!m_num.empty() && !m_num.back()){
 		m_num.pop_back();
 		to_return++;
 	}
