@@ -4,13 +4,12 @@
 
 using namespace std;
 
-#ifndef COMPUTE
-#define COMPUTE
+#ifndef COMPUTELEGACY
+#define COMPUTELEGACY
 
-class compute {
+class computeLegacy {
 	float time_in_sec;
 	big N;
-	big L;
 
 	vector< pair<big,big> > mapping;
 
@@ -27,9 +26,8 @@ class compute {
 
 	string fileNameCreater(string);
 public:
-	compute(string);
-	compute(big);
-	big& getPhy(){ return L; };
+	computeLegacy(string);
+	computeLegacy(big);
 	float getTimeSec(){ return time_in_sec; };
 };
 

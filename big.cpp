@@ -82,7 +82,7 @@ vector<bool> big::string_to_vector(string num){
 				dec.push_back(9);
 				break;
 			default:
-				throw;
+				break;
 		}
 	}
 
@@ -322,6 +322,38 @@ big big::operator % (const big& y){
 		temp = "0";
 
 	return temp;
+}
+
+big big::operator / (const big& y){
+	big temp = *this;
+	big yp = y;
+
+	big to_return = big("0");
+	big one("1");
+	big two("2");
+	big zero("0");
+	big qu = one;
+
+	while(temp > yp){
+		if( !(double_input_times(yp,1) > temp) ){
+			yp = double_input_times(yp,1);
+			qu = qu * two;
+		}else{
+			temp = temp - yp;
+			to_return = to_return + qu;
+			yp = y;
+			qu = one;
+		}
+	}
+
+	if(temp == y){
+		to_return = to_return + one;
+		return to_return;
+	}else if(temp == zero){
+		return to_return;
+	}
+
+	return zero;
 }
 
 void big::div (){

@@ -28,6 +28,7 @@ public:
 	bool operator > (const big&);
 	bool operator < (const big&);
 	big operator % (const big&);
+	big operator / (const big&);
 	big double_input_times(const big&,int);
 
 	void div ();

@@ -8,7 +8,9 @@
 #include "compute.h"
 
 // constructor
-compute::compute (string input){
+compute::compute (big input){
+	cout<<"\n\nComputing Phy by New Algorithm... "<<endl;
+	
 	clock_t t0,t1,t2;
 	t0 = clock();
 	cout<< "Creating Bitwise numbers needed..." <<flush;
@@ -26,7 +28,94 @@ compute::compute (string input){
 	big starter_remainder_base = remainder_base;
 	big mod_remainder("1");
 
-	cout<< " DONE\n\nComputing 2^N (mod N)..."<<endl;
+	cout<< " DONE\nComputing 2^N (mod N)..."<<endl;
+	bool mapped = false;
+
+	mapping.push_back(make_pair(remainder_base_size,remainder_base));
+
+	cout<< "\tCreating Mappings for fast computation..."<<flush;
+
+	while(!mapped){
+		if( !(remainder_base_size.double_input_times(remainder_base_size,1) < remain_time ) ){
+			mapped = true;
+		}else{
+			//main loop
+			remainder_base = (remainder_base * remainder_base) % N;
+			remainder_base_size = remainder_base_size.double_input_times(remainder_base_size,1);
+			mapping.push_back(make_pair(remainder_base_size,remainder_base));
+		}
+	}
+
+	cout<<" DONE\n\tNow Computing 2^N (mod N)..."<<flush;
+	while( !(remain_time == zero) ){
+		if( !(remain_time > starter_time) ){
+			//do the remaining
+			cout<<"\n\tLoop Part DONE. Computing the remainings..."<<flush;
+			mod_remainder = ( mod_remainder * big(big_to_sizet(remain_time)) ) % N;
+			remain_time = zero;
+		}else{
+			// restart from start_time
+			pair<big, big> cut_pair = largest_less(remain_time);
+			mod_remainder = ( mod_remainder * (cut_pair.second) ) % N;
+			remain_time = remain_time - (cut_pair.first);
+		}
+	}
+
+	t1 = clock();
+	cout<<" DONE\nTime Used to find L: " << (float)(((float)t1 - (float)t0)/ CLOCKS_PER_SEC) <<" secs"<<endl;
+	cout<< "Computing Phy(N)... "<<flush;
+	L = mod_remainder;
+
+	// L = L + N
+	L = L + N;
+	big Phy = N;
+	big one("1");
+
+	mapping.clear();
+
+	big cutTimeBig;
+	while(!(L == one)){
+		size_t cutTime = L.div_many();
+
+		if(cutTime != 0){
+			for(size_t i=0;i<cutTime;i++){
+				Phy = Phy - one;
+			}
+		}else if(!(L == one)){
+			L = L + N;
+		}
+	}
+
+	t2 = clock();
+	cout<<" DONE\nPhy(N) = "<<big_to_sizet(Phy)<< " (in size_t, which may overflow)"<<endl;
+
+	float totalTimeInSec = ((float)t2 - (float)t0)/ CLOCKS_PER_SEC;
+	cout<<"Total time used to find Phy(N): "<< totalTimeInSec <<" secs"<<endl;
+
+	time_in_sec = totalTimeInSec;
+}
+
+compute::compute (string input){
+	cout<<"\n\nComputing Phy by New Algorithm... "<<endl;
+	
+	clock_t t0,t1,t2;
+	t0 = clock();
+	cout<< "Creating Bitwise numbers needed..." <<flush;
+
+	N = input;
+
+	big remainder_base( N.getBinVector().size() *8);
+	big remainder_base_size = sizet_to_big( N.getBinVector().size() *8);
+	remainder_base = remainder_base % N;
+	big two("2");
+	big zero("0");
+
+	big remain_time = N;
+	big starter_time = remainder_base_size;
+	big starter_remainder_base = remainder_base;
+	big mod_remainder("1");
+
+	cout<< " DONE\nComputing 2^N (mod N)..."<<endl;
 	int totalLoops = 0;
 	int loopTimes = 1;
 	bool mapped = false;
@@ -48,7 +137,7 @@ compute::compute (string input){
 	}
 
 	loopTimes = 1;
-	cout<<" DONE\n\n\tNow Computing 2^N (mod N)... Loops: "<<flush;
+	cout<<" DONE\n\tNow Computing 2^N (mod N)... Loops: "<<flush;
 	while( !(remain_time == zero) ){
 		showLoopTimes(loopTimes++);
 		++totalLoops;
@@ -66,8 +155,8 @@ compute::compute (string input){
 	}
 
 	t1 = clock();
-	cout<<" DONE\n\nTime Used to find L: " << (float)(((float)t1 - (float)t0)/ CLOCKS_PER_SEC) <<" secs"<<endl;
-	cout<< "\nComputing Phy(N)... Loops: "<<flush;
+	cout<<" DONE\nTime Used to find L: " << (float)(((float)t1 - (float)t0)/ CLOCKS_PER_SEC) <<" secs"<<endl;
+	cout<< "Computing Phy(N)... Loops: "<<flush;
 	L = mod_remainder;
 
 	// L = L + N
@@ -93,48 +182,15 @@ compute::compute (string input){
 			L = L + N;
 		}
 	}
-	/* Legacy Code
-	while(!(L == one)){
-		while(L.divable()){
-			showLoopTimes(loopTimes++);
-			++totalLoops;
-			
-			L.div();
-			Phy = Phy - one;
-		}
 
-		L = (L == one)? L : L+N;
-	}
-	*/
 	t2 = clock();
 	cout<<" DONE\nPhy(N) = "<<big_to_sizet(Phy)<< " (in size_t, which may overflow)"<<endl;
 
 	float totalTimeInSec = ((float)t2 - (float)t0)/ CLOCKS_PER_SEC;
-	cout<<"\nTotal time used to find Phy(N): "<< totalTimeInSec <<" secs"<<endl;
+	cout<<"Total time used to find Phy(N): "<< totalTimeInSec <<" secs"<<endl;
 	cout<<"Total Loops: " << totalLoops <<endl;
-	cout<<"Writing Results to file... "<<flush;
 
-	ofstream outputFile;
-	outputFile.open("o.txt");
-
-	if(outputFile){
-		outputFile << "N =\n\t" << input <<endl;
-		outputFile << "\nL (Bin) =\n\t" << mod_remainder.getBinString()  <<endl;
-		outputFile << "\nPhy(N) (Bin) =\n\t" << Phy.getBinString() <<endl;
-		outputFile << "\nTotal Time Used: "<< totalTimeInSec <<" secs"<<endl;
-	}else{
-		cout<< "\nError opening file!\n"<<endl;
-	}
-	outputFile.close();
-
-	cout<<"DONE\n"<<endl;
-	/*
-	bool four = remain_one(2, Phy);
-	bool eight = remain_one(3, Phy);
-
-	cout<<"4^Phy(N) == 1 ? "<< four <<endl;
-	cout<<"8^Phy(N) == 1 ? "<< eight <<endl;
-	*/
+	time_in_sec = totalTimeInSec;
 }
 
 // private function
